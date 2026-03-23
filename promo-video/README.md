@@ -112,7 +112,7 @@ python3 -c "import whisper; print('Whisper OK')"    # Mac / Linux
 ## Step 2: Install Antigravity
 
 Download and install **Antigravity** from:
-**https://antigravity.ai**
+**https://antigravity.google/download**
 
 This is the AI agent that runs the skill for you.
 
