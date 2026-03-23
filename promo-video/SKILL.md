@@ -231,7 +231,7 @@ Use your creative expertise to decide visual style and animation approach based 
 
 **Create the project (non-interactive):**
 ```bash
-yes "" | npx create-video@latest --blank --no-git promo-video/<project-name>
+npx create-video@latest --blank --no-git promo-video/<project-name>
 cd promo-video/<project-name>
 npm install
 npm install lucide-react  # For icons
