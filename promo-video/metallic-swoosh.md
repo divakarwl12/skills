@@ -79,13 +79,85 @@ export const metallicSwoosh = (): TransitionPresentation<Record<string, never>> 
 
 ## Usage
 
-```tsx
-import { metallicSwoosh } from "./transitions/MetallicSwoosh";
+> **IMPORTANT:** Do NOT use `TransitionSeries` from `@remotion/transitions`. It crashes
+> in Remotion 4.x with `TypeError: Cannot read properties of null (reading 'stack')` due
+> to a bundler bug with null JSX props. Use the manual overlapping `Sequence` approach below.
 
-<TransitionSeries.Transition
-  presentation={metallicSwoosh()}
-  timing={linearTiming({ durationInFrames: 12 })} // 0.4s at 30fps
-/>
+### Working pattern — manual overlapping Sequences
+
+```tsx
+import { AbsoluteFill, Sequence, useCurrentFrame, interpolate } from "remotion";
+
+const T = 12; // transition overlap in frames (0.4s at 30fps)
+
+// Crossfade wrapper — fades in for first T frames, out for last T frames
+const Crossfade: React.FC<{
+  children: React.ReactNode;
+  duration: number;
+  fadeIn?: boolean;
+  fadeOut?: boolean;
+}> = ({ children, duration, fadeIn = true, fadeOut = true }) => {
+  const frame = useCurrentFrame();
+  const inOpacity  = fadeIn  ? interpolate(frame, [0, T], [0, 1], { extrapolateRight: "clamp" }) : 1;
+  const outOpacity = fadeOut ? interpolate(frame, [duration - T, duration], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) : 1;
+  return (
+    <AbsoluteFill style={{ opacity: Math.min(inOpacity, outOpacity) }}>
+      {children}
+    </AbsoluteFill>
+  );
+};
+
+// Metallic shine overlay — render in a separate Sequence at each transition point
+const MetallicOverlay: React.FC = () => {
+  const frame = useCurrentFrame();
+  const pos = interpolate(frame, [0, T], [-20, 120]);
+  return (
+    <div style={{
+      position: "absolute", inset: 0,
+      background: `linear-gradient(
+        105deg,
+        transparent ${pos - 14}%,
+        rgba(255,255,255,0.0) ${pos - 9}%,
+        rgba(255,255,255,0.15) ${pos - 5}%,
+        rgba(200,218,240,0.5) ${pos - 2}%,
+        rgba(255,255,255,0.85) ${pos}%,
+        rgba(210,225,245,0.5) ${pos + 2}%,
+        rgba(255,255,255,0.15) ${pos + 5}%,
+        rgba(255,255,255,0.0) ${pos + 9}%,
+        transparent ${pos + 14}%
+      )`,
+      pointerEvents: "none",
+      zIndex: 100,
+    }} />
+  );
+};
+
+// In your main composition — scenes overlap by T frames, MetallicOverlay plays at each join
+const D = { sceneA: 300, sceneB: 270 };
+const S = { sceneA: 0, sceneB: D.sceneA - T };
+
+export const MainPromo: React.FC = () => (
+  <AbsoluteFill>
+    {/* Scene A — no fade-in on first scene */}
+    <Sequence from={S.sceneA} durationInFrames={D.sceneA} premountFor={30}>
+      <Crossfade duration={D.sceneA} fadeIn={false}>
+        <SceneA />
+      </Crossfade>
+    </Sequence>
+
+    {/* Scene B — fades in / fades out */}
+    <Sequence from={S.sceneB} durationInFrames={D.sceneB} premountFor={30}>
+      <Crossfade duration={D.sceneB}>
+        <SceneB />
+      </Crossfade>
+    </Sequence>
+
+    {/* Metallic shine overlay — plays only during the T-frame transition window */}
+    <Sequence from={S.sceneB} durationInFrames={T}>
+      <MetallicOverlay />
+    </Sequence>
+  </AbsoluteFill>
+);
 ```
 
 ## Recommended speed

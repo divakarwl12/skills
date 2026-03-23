@@ -10,16 +10,50 @@ You are a **20-year veteran motion graphics designer and visual marketing expert
 
 Your creative instincts guide every decision. The guidelines below are suggestions, not rules.
 
-## Prerequisites
+## Install This Skill
 
-This skill uses `remotion-best-practices` for Remotion fundamentals.
+Install both this skill and the required `remotion-best-practices` companion:
 
 ```bash
-ls ~/.claude/skills/remotion-best-practices/SKILL.md 2>/dev/null && echo "INSTALLED" || echo "NOT INSTALLED"
+# Works on Mac, Linux, and Windows (PowerShell / CMD)
+npx skills add divakarwl12/skills
+npx skills add remotion-dev/skills
 ```
 
-If not installed:
-> Install with: `npx skills add remotion-dev/skills`
+---
+
+## Dependencies (Install Before Starting)
+
+These tools must be installed on the user's machine:
+
+**Mac / Linux:**
+```bash
+pip install openai-whisper
+brew install ffmpeg          # Mac; Linux: sudo apt install ffmpeg
+```
+
+**Windows (PowerShell):**
+```powershell
+pip install openai-whisper
+# ffmpeg: https://ffmpeg.org/download.html  -> Windows builds
+# Run the installer and check "Add ffmpeg to PATH", then restart terminal
+```
+
+Verify:
+```bash
+python -c "import whisper; print('Whisper OK')"
+ffmpeg -version
+```
+
+---
+
+## Prerequisites
+
+This skill uses `remotion-best-practices` for Remotion fundamentals. Auto-install if missing:
+
+```bash
+ls ~/.claude/skills/remotion-best-practices/SKILL.md 2>/dev/null || npx skills add remotion-dev/skills
+```
 
 ---
 
@@ -231,11 +265,15 @@ Use your creative expertise to decide visual style and animation approach based 
 
 **Create the project (non-interactive):**
 ```bash
-npx create-video@latest --blank --no-git promo-video/<project-name>
+npx create-video@latest --blank --no-git --yes promo-video/<project-name>
 cd promo-video/<project-name>
 npm install
 npm install lucide-react  # For icons
 ```
+
+> **If interactive prompts appear** (TailwindCSS? Agent skills?): press **Enter** to accept
+> defaults for each. The `--yes` flag suppresses them on most versions, but some builds may
+> still prompt once.
 
 Set composition to **1920x1080** (full HD):
 ```tsx
@@ -299,9 +337,25 @@ If "Needs changes", iterate on their feedback before moving on.
 
 **The voiceover must match the visuals.** This is non-negotiable.
 
+### Step 0: Set Up ElevenLabs API Key
+
+Before generating anything, create a `.env` file in the project root:
+
+```bash
+# Create the .env file (Mac/Linux/Windows Git Bash)
+echo "ELEVEN_LABS_API_KEY=paste_your_key_here" > .env
+```
+
+Then tell the user:
+> Open the `.env` file and replace `paste_your_key_here` with your ElevenLabs API key.
+> Get it free at **elevenlabs.io** → Profile → API Keys.
+> Press Enter / confirm once you've saved the file.
+
+Wait for the user to confirm before proceeding.
+
 1. **Extract scene timings** from your composition
 2. **Write script that references what's on screen**
-3. **Generate with ElevenLabs** (needs `ELEVEN_LABS_API_KEY`)
+3. **Generate with ElevenLabs** (reads key from `.env` automatically)
 4. **Verify with Whisper** - check actual timestamps
 5. **Fix ALL overlaps immediately** - don't ask, just fix:
    - Shorten text (make it punchier)
@@ -333,16 +387,31 @@ Ask about music:
 ```
 
 **Music files** (royalty-free from Pixabay, bundled in skill):
-```bash
-# Copy selected track to project
-cp "${SKILL_DIR}/music/inspired-ambient-141686.mp3" background-music.mp3
-# OR
-cp "${SKILL_DIR}/music/motivational-day-112790.mp3" background-music.mp3
-# OR
-cp "${SKILL_DIR}/music/the-upbeat-inspiring-corporate-142313.mp3" background-music.mp3
 
-# Verify
-ls -lah background-music.mp3 && file background-music.mp3
+```bash
+# Mac / Linux — copy selected track to project
+cp ~/.claude/skills/promo-video/music/inspired-ambient-141686.mp3 background-music.mp3
+# OR
+cp ~/.claude/skills/promo-video/music/motivational-day-112790.mp3 background-music.mp3
+# OR
+cp ~/.claude/skills/promo-video/music/the-upbeat-inspiring-corporate-142313.mp3 background-music.mp3
+```
+
+```powershell
+# Windows (PowerShell) — copy selected track to project
+Copy-Item "$env:USERPROFILE\.claude\skills\promo-video\music\inspired-ambient-141686.mp3" background-music.mp3
+# OR
+Copy-Item "$env:USERPROFILE\.claude\skills\promo-video\music\motivational-day-112790.mp3" background-music.mp3
+# OR
+Copy-Item "$env:USERPROFILE\.claude\skills\promo-video\music\the-upbeat-inspiring-corporate-142313.mp3" background-music.mp3
+```
+
+```bash
+# Verify (Mac/Linux)
+ls -lah background-music.mp3
+
+# Verify (Windows)
+dir background-music.mp3
 ```
 
 **Mix audio:**
@@ -385,9 +454,11 @@ When user gives feedback, common fixes:
 
 ## DON'Ts
 
+- **No TransitionSeries** — `TransitionSeries` from `@remotion/transitions` crashes in Remotion 4.x with `TypeError: Cannot read properties of null (reading 'stack')`. This is a bundler bug with null JSX props. **Always** use manual overlapping `Sequence` + `Crossfade` wrapper + separate `MetallicOverlay` sequence. See [metallic-swoosh.md](metallic-swoosh.md) for the working pattern.
 - **No jitter effects** - No shaking, vibrating, or jittery motion. Everything should feel smooth and controlled.
 - **No full scene spinning** - Don't rotate the entire scene or composition. 3D rotation should be subtle and purposeful (e.g. a browser mockup with slight perspective tilt, not a 360° spin).
 - **No 3D transforms in transitions** - Flip, rotate, and other 3D transform-based transitions don't render reliably. Stick to 2D: opacity, position, scale, and gradient masks. (3D transforms are fine for in-scene elements like browser mockups.)
+- **No `export ELEVEN_LABS_API_KEY=...`** — Environment variables set this way disappear when the shell closes. Always use a `.env` file in the project root instead. The `generate_voiceover.py` script loads it automatically.
 
 ---
 

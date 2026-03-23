@@ -4,10 +4,59 @@ Generate professional AI voiceover using ElevenLabs, precisely timed and content
 
 ## Requirements
 
-- `ELEVEN_LABS_API_KEY` environment variable
-- `ffmpeg` installed for audio processing
-- `whisper` CLI or Python package for timing verification
+- ElevenLabs API key (stored in `.env` file — see setup below)
+- `ffmpeg` installed and on PATH
+- `openai-whisper` Python package for timing verification
 - Python 3.x for the generation script
+
+---
+
+## Setup: ElevenLabs API Key (.env file)
+
+**Before running the voiceover script, create a `.env` file in the project root:**
+
+```bash
+# Create .env file
+echo "ELEVEN_LABS_API_KEY=paste_your_key_here" > .env
+```
+
+Then tell the user to:
+1. Open the `.env` file
+2. Replace `paste_your_key_here` with their actual ElevenLabs API key
+3. Get their key at: **https://elevenlabs.io** → Profile → API Keys (free tier available)
+
+The `generate_voiceover.py` script auto-loads from `.env` — no manual export needed.
+
+> **Windows note:** The `.env` file approach works on all platforms. Never use
+> `export ELEVEN_LABS_API_KEY=...` in Antigravity — it disappears when the shell closes.
+
+---
+
+## Setup: Install Whisper + ffmpeg
+
+Whisper is used to transcribe the generated audio and verify that voiceover timing
+matches the video scenes. Install it before running the voiceover pipeline.
+
+**Mac / Linux:**
+```bash
+pip install openai-whisper
+brew install ffmpeg          # Mac only; Linux: sudo apt install ffmpeg
+```
+
+**Windows:**
+```powershell
+pip install openai-whisper
+# ffmpeg: download the installer from https://ffmpeg.org/download.html
+# During install, check "Add to PATH" — then restart your terminal
+```
+
+Verify installation:
+```bash
+python -c "import whisper; print('Whisper OK')"
+ffmpeg -version
+```
+
+---
 
 ## Critical Workflow: Scene-Voiceover Alignment
 

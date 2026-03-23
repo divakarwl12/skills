@@ -3,14 +3,16 @@
 Generate timed voiceover for promo videos using ElevenLabs API.
 
 Usage:
-    1. Set ELEVEN_LABS_API_KEY environment variable
+    1. Create a .env file in the project root with:
+           ELEVEN_LABS_API_KEY=your_key_here
+       Get your key at: https://elevenlabs.io -> Profile -> API Keys
     2. Edit the `sections` list below with your script
     3. Run: python generate_voiceover.py
 
 Requirements:
     - Python 3.x
-    - ffmpeg installed
-    - ELEVEN_LABS_API_KEY environment variable
+    - ffmpeg installed and on PATH
+    - ElevenLabs API key in .env file (or ELEVEN_LABS_API_KEY env var)
 """
 
 import urllib.request
@@ -18,6 +20,27 @@ import json
 import subprocess
 import os
 import sys
+
+
+def _load_dotenv():
+    """Load .env file into environment variables (no external library needed)."""
+    # Look for .env in current directory or one level up (project root)
+    candidates = [".env", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".env")]
+    for env_file in candidates:
+        if os.path.exists(env_file):
+            with open(env_file, encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith("#") and "=" in line:
+                        key, _, val = line.partition("=")
+                        val = val.strip().strip('"').strip("'")
+                        os.environ.setdefault(key.strip(), val)
+            break
+
+
+# Auto-load .env if API key not already in environment
+if not os.environ.get("ELEVEN_LABS_API_KEY"):
+    _load_dotenv()
 
 # Configuration
 API_KEY = os.environ.get("ELEVEN_LABS_API_KEY")
@@ -54,14 +77,22 @@ sections = [
 def check_requirements():
     """Verify API key and ffmpeg are available."""
     if not API_KEY:
-        print("Error: ELEVEN_LABS_API_KEY environment variable not set")
-        print("Set it with: export ELEVEN_LABS_API_KEY=your_key_here")
+        print("Error: ElevenLabs API key not found.")
+        print("")
+        print("Create a .env file in your project root:")
+        print("    ELEVEN_LABS_API_KEY=your_key_here")
+        print("")
+        print("Get your key at: https://elevenlabs.io -> Profile -> API Keys")
         sys.exit(1)
 
     try:
         subprocess.run(["ffmpeg", "-version"], capture_output=True, check=True)
     except (subprocess.CalledProcessError, FileNotFoundError):
-        print("Error: ffmpeg not found. Install it with: brew install ffmpeg")
+        print("Error: ffmpeg not found.")
+        print("")
+        print("Install ffmpeg:")
+        print("  Mac:     brew install ffmpeg")
+        print("  Windows: https://ffmpeg.org/download.html  (add to PATH)")
         sys.exit(1)
 
 
