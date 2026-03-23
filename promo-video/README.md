@@ -4,29 +4,7 @@ Create professional AI-powered promotional videos using Remotion, ElevenLabs voi
 
 ---
 
-## Step 1: Install Antigravity (Claude Code)
-
-Download and install **Antigravity** (Claude Code) from:
-**https://www.anthropic.com/claude-code**
-
-This is the AI agent that runs the skill for you.
-
----
-
-## Step 2: Install the Skill
-
-Open your terminal and run:
-
-```bash
-npx skills add divakarwl12/skills
-npx skills add remotion-dev/skills
-```
-
-> Works on Mac, Windows (PowerShell / Git Bash), and Linux.
-
----
-
-## Step 3: Install Required Dependencies
+## Step 1: Install Required Dependencies
 
 You need **4 tools** installed on your machine before the skill will work.
 
@@ -128,6 +106,28 @@ Verify:
 python -c "import whisper; print('Whisper OK')"     # Windows
 python3 -c "import whisper; print('Whisper OK')"    # Mac / Linux
 ```
+
+---
+
+## Step 2: Install Antigravity
+
+Download and install **Antigravity** from:
+**https://antigravity.ai**
+
+This is the AI agent that runs the skill for you.
+
+---
+
+## Step 3: Install the Skill
+
+Open your terminal and run:
+
+```bash
+npx skills add divakarwl12/skills
+npx skills add remotion-dev/skills
+```
+
+> Works on Mac, Windows (PowerShell / Git Bash), and Linux.
 
 ---
 
