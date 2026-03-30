@@ -56,7 +56,7 @@ brew install python
 ```
 
 **Windows:**
-Download from **https://python.org**
+Download from **[https://python.org](https://www.python.org/downloads/release/python-31311/)**
 > During install, check **"Add Python to PATH"** — this is required.
 
 **Linux:**
