@@ -14,7 +14,19 @@ You need **4 tools** installed on your machine before the skill will work.
 
 Used to build the Remotion video project.
 
-**Mac:**
+**Mac (Step 1 of 2): Install Homebrew**
+
+Homebrew is a package manager required to install Node.js on Mac. If you don't have it yet, run this in your Terminal:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+> Verify Homebrew installed correctly by running: `brew --version`
+> After installation, follow any on-screen instructions (it may ask you to add Homebrew to your PATH). Then proceed to Step 2 of 2 below.
+
+**Mac (Step 2 of 2): Install Node.js via Homebrew**
+
 ```bash
 brew install node
 ```
@@ -197,6 +209,7 @@ The skill will:
 | `ffmpeg: command not found` | Install ffmpeg — Windows: `winget install ffmpeg`, Mac: `brew install ffmpeg` |
 | `ModuleNotFoundError: No module named 'whisper'` | Run `pip install openai-whisper` (Win) or `pip3 install openai-whisper` (Mac) |
 | `.env file not found / API key error` | Open the `.env` file created in your project folder and paste your ElevenLabs key |
+| `brew: command not found` (Mac) | Install Homebrew first — see Step 1 above for the install command |
 | Empty project folders being created repeatedly | A stray `.git` folder exists in your home directory. Delete it: `rm -rf ~/.git` |
 | Interactive prompts appear during project creation | Press **Enter** to accept each default — the skill handles this automatically |
 
